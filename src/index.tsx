@@ -10,6 +10,31 @@ export interface Item {
   [key: string]: any;
 }
 
+export interface Order {
+  id: string;
+  itemIds: string[];
+  itemsTotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+  handling: number;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  orderId: string;
+  company: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  postCode: string;
+  country: string;
+  suburb: string;
+}
+
 export interface InitialState {
   id: string;
   items: Item[];
@@ -18,6 +43,8 @@ export interface InitialState {
   totalUniqueItems: number;
   cartTotal: number;
   metadata?: Metadata;
+  user?: User;
+  order?: Order;
 }
 
 export interface Metadata {
@@ -36,6 +63,8 @@ export interface CartProviderState extends InitialState {
   clearCartMetadata: () => void;
   setCartMetadata: (metadata: Metadata) => void;
   updateCartMetadata: (metadata: Metadata) => void;
+  setUser: (user: User) => void;
+  setOrder: (order: Order) => void;
 }
 
 export type Actions =
@@ -50,7 +79,10 @@ export type Actions =
   | { type: "EMPTY_CART" }
   | { type: "CLEAR_CART_META" }
   | { type: "SET_CART_META"; payload: Metadata }
-  | { type: "UPDATE_CART_META"; payload: Metadata };
+  | { type: "UPDATE_CART_META"; payload: Metadata }
+
+  | { type: "SET_USER"; payload: User }
+  | { type: "SET_ORDER"; payload: Order };
 
 export const initialState: any = {
   items: [],
@@ -59,6 +91,8 @@ export const initialState: any = {
   totalUniqueItems: 0,
   cartTotal: 0,
   metadata: {},
+  user: {},
+  order: {},
 };
 
 const CartContext = React.createContext<CartProviderState | undefined>(
@@ -78,6 +112,18 @@ export const useCart = () => {
 
 function reducer(state: CartProviderState, action: Actions) {
   switch (action.type) {
+    case "SET_USER":
+      return {
+        ...state,
+        user: action.payload,
+      };
+
+    case "SET_ORDER":
+      return {
+        ...state,
+        order: action.payload,
+      };
+
     case "SET_ITEMS":
       return generateCartState(state, action.payload);
 
@@ -195,7 +241,7 @@ export const CartProvider: React.FC<{
   const id = cartId ? cartId : createCartIdentifier();
 
   const [savedCart, saveCart] = storage(
-    cartId ? `react-use-cart-${id}` : `react-use-cart`,
+    cartId ? `${id}` : `react-use-cart`,
     JSON.stringify({
       id,
       ...initialState,
@@ -208,6 +254,20 @@ export const CartProvider: React.FC<{
   React.useEffect(() => {
     saveCart(JSON.stringify(state));
   }, [state, saveCart]);
+
+  const setUser = (user: User) => {
+    dispatch({
+      type: "SET_USER",
+      payload: user,
+    });
+  };
+
+  const setOrder = (order: Order) => {
+    dispatch({
+      type: "SET_ORDER",
+      payload: order,
+    });
+  };
 
   const setItems = (items: Item[]) => {
     dispatch({
@@ -343,6 +403,8 @@ export const CartProvider: React.FC<{
         clearCartMetadata,
         setCartMetadata,
         updateCartMetadata,
+        setUser,
+        setOrder,
       }}
     >
       {children}
