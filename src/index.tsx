@@ -90,7 +90,8 @@ export type Actions =
   | { type: "UPDATE_CART_META"; payload: Metadata }
 
   | { type: "SET_USER"; payload: User }
-  | { type: "SET_ORDER"; payload: Order };
+  | { type: "SET_ORDER"; payload: Order }
+  | { type: "SET_TOKEN"; payload: Token };
 
 export const initialState: any = {
   items: [],
@@ -131,6 +132,12 @@ function reducer(state: CartProviderState, action: Actions) {
       return {
         ...state,
         order: action.payload,
+      };
+
+    case "SET_TOKEN":
+      return {
+        ...state,
+        token: action.payload,
       };
 
     case "SET_ITEMS":
@@ -270,6 +277,13 @@ export const CartProvider: React.FC<{
       payload: user,
     });
   };
+
+  const setToken = (token: Token) => {
+    dispatch({
+      type: "SET_TOKEN",
+      payload: token,
+    });
+  }
 
   const setOrder = (order: Order) => {
     dispatch({
@@ -414,6 +428,7 @@ export const CartProvider: React.FC<{
         updateCartMetadata,
         setUser,
         setOrder,
+        setToken,
       }}
     >
       {children}
