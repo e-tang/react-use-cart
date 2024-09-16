@@ -12,6 +12,7 @@ export interface Item {
 
 export interface Order {
   id: string;
+  userId: string;
   itemIds: string[];
   itemsTotal: number;
   shipping: number;
@@ -22,17 +23,23 @@ export interface Order {
 
 export interface User {
   id: string;
-  name: string;
+  name: string;  // first_name
+  last_name: string;
   email: string;
-  orderId: string;
   company: string;
   phone: string;
   address: string;
+  address2: string; // the second line of the address
   city: string;
   state: string;
-  postCode: string;
+  post_code: string;
   country: string;
   suburb: string;
+}
+
+export interface Token {
+  jwt: string;
+  last_checked: string; // last time the token was checked
 }
 
 export interface InitialState {
@@ -65,6 +72,7 @@ export interface CartProviderState extends InitialState {
   updateCartMetadata: (metadata: Metadata) => void;
   setUser: (user: User) => void;
   setOrder: (order: Order) => void;
+  setToken: (token: Token) => void;
 }
 
 export type Actions =
@@ -93,6 +101,7 @@ export const initialState: any = {
   metadata: {},
   user: {},
   order: {},
+  token: null,
 };
 
 const CartContext = React.createContext<CartProviderState | undefined>(
